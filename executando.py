@@ -38,13 +38,17 @@ def menuAluno():
         if op < 1 or op > 5:
             raise ValueError
         if op == 1:
-            cadastrarAluno()
+            while True:
+                cadastrarAluno()
         if op == 2:
-            alterarAluno()
+            while True:
+                alterarAluno()
         if op == 3:
-            buscarDados()
+            while True:
+                buscarDados()
         if op == 4:
-            historico()
+            while True:
+                historico()
         if op == 5:
             break
     except ValueError:
@@ -87,3 +91,20 @@ try:
         break()
 except ValueError:
     print("Insira uma opção válida.")
+
+def cadastrarAluno():
+    try:
+        nome = input("NOME: ")
+        cpf = input("CPF: ")
+        for c in nome:
+            if c.isdigit():
+                raise ValueError
+        for c in cpf:
+            if not c.isdigit():
+                ccpf = False
+        if not ccpf:
+            print("CPF inválido.")
+            raise ValueError
+        escola.adicaoAluno(nome, cpf)
+    except ValueError:
+        print("Insira um dado")

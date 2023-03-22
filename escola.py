@@ -72,3 +72,7 @@ nota REAL NOT NULL
 )"""
 cursor.execute(comando)
 db.commit()
+
+def adicaoAluno(n, id):
+    cursor.execute("""INSERT INTO Alunos (nome, cpf) VALUES (n, id)""")
+    db.commit()
