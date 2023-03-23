@@ -1,12 +1,12 @@
 import sqlite3
 #inicializando banco de dados
 db = sqlite3.connect("escola.db")
-cursor = banco.cursor()
+cursor = db.cursor()
 
 #tabela p/ dados dos alunos:
 comando = """CREATE TABLE Alunos (
-codAluno integer PRIMARY KEY NOT NULL
-nome text NOT NULL
+codAluno integer PRIMARY KEY NOT NULL,
+nome VARCHAR NOT NULL,
 cpf integer NOT NULL
 )"""
 cursor.execute(comando)
@@ -74,7 +74,7 @@ cursor.execute(comando)
 db.commit()
 
 def adicaoAluno(n, id):
-    cursor.execute("""INSERT INTO Alunos (nome, cpf) VALUES (n, id)""")
+    cursor.execute(f"""INSERT INTO Alunos (nome, cpf) VALUES ('{n}', '{id}')""")
     db.commit()
 
 def buscarAluno(n=None, id=None):
@@ -87,15 +87,22 @@ def buscarAluno(n=None, id=None):
         else:
             return False
     elif n == None and id != None:
-        cursor.execute(f"SELECT nome FROM Alunos WHERE cpf = {id}")
+        cursor.execute(f"SELECT nome FROM Alunos WHERE cpf = '{id}'")
         if len(cursor.fetchall()) > 0:
             return True
         else:
             return False
 
 def alterarDados(tabela, dado, dado_antigo, dado_novo):
-    cursor.execute(f"""
-    UPDATE {tabela}
-    SET {dado} = {dado_novo}
-    WHERE {dado} = {dado_antigo}""")
-    db.commit()
+    if isinstance(dado_antigo, str):
+        cursor.execute(f"""
+        UPDATE {tabela}
+        SET {dado} = '{dado_novo}'
+        WHERE {dado} = '{dado_antigo}'""")
+        db.commit()
+    else:
+        cursor.execute(f"""
+        UPDATE {tabela}
+        SET {dado} = {dado_novo}
+        WHERE {dado} = {dado_antigo}""")
+        db.commit()
