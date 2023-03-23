@@ -155,6 +155,5 @@ def alterarAluno():
             raise ValueError
         elif op == 2:
             break
-
         except ValueError:
             print("Insira um dado/opção válido")
