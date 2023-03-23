@@ -92,7 +92,7 @@ def menuEscola():
 def cadastrarAluno():
     while True:
         try:
-            nome = input("NOME: ")
+            nome = input("NOME: ").strip().upper()
             cpf = input("CPF: ")
             ccpf = True
             for c in nome:
@@ -104,7 +104,7 @@ def cadastrarAluno():
             if not ccpf:
                 print("CPF inválido.")
                 raise ValueError
-            escola.adicaoAluno(nome.upper(), cpf)
+            escola.adicaoAluno(nome, cpf)
             op = int(input("CADASTRAR MAIS ALUNOS? 1- SIM / 2- VOLTAR_"))
             if op < 1 or op > 2:
                 raise ValueError
@@ -135,6 +135,8 @@ def alterarAluno():
                 if not escola.buscarAluno(id=cpf):
                     print("ALUNO NÃO ENCONTRADO.")
                     dado = False
+                else:
+                    dado = True
             elif cpf == "" and nome != "":
                 if not escola.buscarAluno(n=nome.lower()):
                     print("ALUNO NÃO ENCONTRADO.")
