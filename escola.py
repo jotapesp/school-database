@@ -89,25 +89,43 @@ if not tableExists('Hist_Disc'):
     cursor.execute(comando)
     db.commit()
 
-def adicaoAluno(n, id):
-    cursor.execute(f"""INSERT INTO Alunos (nome, cpf) VALUES ('{n}', '{id}')""")
+def adicaoElemento(categoria, n, id):
+    if categoria == "ALUNO":
+        cursor.execute(f"""INSERT INTO Alunos (nome, cpf) VALUES ('{n}', '{id}')""")
+    elif categoria == "PROFESSOR":
+        cursor.execute(f"""INSERT INTO Professores (nome, cpf) VALUES ('{n}', '{id}')""")
     db.commit()
 
-def buscarAluno(n=None, id=None):
+def buscarElemento(categoria, n=None, id=None):
+    tabela = ""
+    if categoria == "ALUNO":
+        tabela = 'Alunos'
+    if categoria == "PROFESSOR":
+        tabela = 'Professores'
     if n == None and id == None:
-        print("Algum dado para busca deve ser inserido.")
+        print("ALGUM DADO PARA BUSCA DEVE SER INSERIDO")
+        return 0
     elif n != None and id == None:
-        cursor.execute(f"SELECT nome FROM Alunos WHERE nome LIKE '%{n}%'")
-        if len(cursor.fetchall()) > 0:
-            return True
+        cursor.execute(f"SELECT nome, cpf FROM {tabela} WHERE nome LIKE '%{n}%'")
+        lista = cursor.fetchall()
+        if len(lista) > 0:
+            return lista
         else:
-            return False
+            return 0
     elif n == None and id != None:
-        cursor.execute(f"SELECT nome FROM Alunos WHERE cpf = '{id}'")
-        if len(cursor.fetchall()) > 0:
-            return True
+        cursor.execute(f"SELECT nome, cpf FROM {tabela} WHERE cpf = '{id}'")
+        lista = cursor.fetchall()
+        if len(lista) > 0:
+            return lista
         else:
-            return False
+            return 0
+    elif n != None and id != None:
+        cursor.execute(f"SELECT nome, cpf FROM {tabela} WHERE cpf = '{id}'")
+        lista = cursor.fetchall()
+        if len(lista) > 0:
+            return lista
+        else:
+            return 0
 
 def alterarDados(tabela, dado, dado_antigo, dado_novo):
     if isinstance(dado_antigo, str):
@@ -122,3 +140,47 @@ def alterarDados(tabela, dado, dado_antigo, dado_novo):
         SET {dado} = {dado_novo}
         WHERE {dado} = {dado_antigo}""")
         db.commit()
+
+def mostrarDados(tabela, categoria, no=None, ide=None):
+    sql = ""
+    if no == None and ide == None:
+        buscarElemento(categoria)
+    elif no == None and ide != None:
+        if buscarElemento(categoria, id=ide) != 0:
+            sql = f"""SELECT *
+            FROM {tabela}
+            WHERE cpf = '{ide}'"""
+    elif no != None and ide == None:
+        if buscarElemento(categoria, n=no) != 0:
+            sql = f"""SELECT * FROM {tabela}
+            WHERE nome LIKE '%{no}%'"""
+    elif no != None and ide != None:
+        if buscarElemento(categoria, no.upper(), ide) != 0:
+            sql = f"""SELECT *
+            FROM {tabela}
+            WHERE nome LIKE '%{no.upper()}%' AND cpf = '{ide}'"""
+
+    cursor.execute(sql)
+    lista = cursor.fetchall()
+    if len(lista) == 1:
+        print(f"\nCOD. IDENTIFICADOR: {lista[0][0]}")
+        for i in range(1, len(lista[0])):
+            print(f"{lista[0][i]}")
+        print()
+#caso o usuário tenha digitado apenas uma parte do nome ...
+# ...tenha encontrado mais de um resultado
+    elif len(lista) > 1:
+        print("\nDADOS ENCONTRADOS: ")
+        for i in range(len(lista)):
+            print(f"{i} - {lista[i][1]}")
+        print(f"{len(lista)} - VOLTAR")
+        op = int(input("DIGITE O NUMERO REFERENTE AO NOME: "))
+        if op < 0 or op > (len(lista) + 1):
+            raise ValueError
+        elif op == len(lista):
+            print("NENHUM NOME SELECIONADO.")
+        elif op >= 0 or op < len(lista):
+            print(f"\nCOD. IDENTIFICADOR: {lista[0][0]}")
+            for i in range(1, len(lista[0])):
+                print(f"{lista[op][i]}")
+            print()

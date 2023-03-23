@@ -21,7 +21,7 @@ def menu():
             elif op == 4:
                 break
         except ValueError:
-            print("Insira uma opção válida.")
+            print("INSIRA UMA OPÇÃO VÁLIDA.")
 
 def menuAluno():
     while True:
@@ -30,24 +30,27 @@ def menuAluno():
             1 - CADASTRAR ALUNO
             2 - ALTERAR CADASTRO DE ALUNO
             3 - BUSCAR DADOS DO ALUNO
-            4 - BUSCAR HISTÓRICO DE ALUNO
-            5 - VOLTAR
+            4 - REGISTRAR NOTA DE ALUNO
+            5 - BUSCAR HISTÓRICO DE ALUNO
+            6 - VOLTAR
             """)
             op = int(input("SELECIONA UMA OPÇÃO: "))
-            if op < 1 or op > 5:
+            if op < 1 or op > 6:
                 raise ValueError
             if op == 1:
-                    cadastrarAluno()
+                cadastrar('ALUNO')
             if op == 2:
-                    alterarAluno()
+                alterarElemento('ALUNO')
             if op == 3:
-                    buscarDados()
+                imprimirDados('ALUNO')
             if op == 4:
-                    historico()
+                registrarNota()
             if op == 5:
+                historico()
+            if op == 6:
                 break
         except ValueError:
-            print("Insira uma opção válida.")
+            print("INSIRA UMA OPÇÃO VÁLIDA.")
 
 def menuProfessor():
     while True:
@@ -62,15 +65,15 @@ def menuProfessor():
             if op < 1 or op > 4:
                 raise ValueError
             if op == 1:
-                cadastrarProfessor()
+                cadastrar('PROFESSOR')
             if op == 2:
-                alterarProfessor()
+                alterarElemento('PROFESSOR')
             if op == 3:
-                buscarDadosProf()
+                imprimirDados('PROFESSOR')
             if op == 4:
                 break
         except ValueError:
-            print("Insira uma opção válida.")
+            print("INSIRA UMA OPÇÃO VÁLIDA.")
 
 def menuEscola():
     while True:
@@ -87,9 +90,9 @@ def menuEscola():
             if op == 2:
                 break
         except ValueError:
-            print("Insira uma opção válida.")
+            print("INSIRA UMA OPÇÃO VÁLIDA.")
 
-def cadastrarAluno():
+def cadastrar(categoria):
     while True:
         try:
             nome = input("NOME: ").strip().upper()
@@ -104,16 +107,16 @@ def cadastrarAluno():
             if not ccpf:
                 print("CPF inválido.")
                 raise ValueError
-            escola.adicaoAluno(nome, cpf)
-            op = int(input("CADASTRAR MAIS ALUNOS? 1- SIM / 2- VOLTAR_"))
+            escola.adicaoElemento(categoria, nome, cpf)
+            op = int(input(f"CADASTRAR MAIS {categoria.upper()}S? 1- SIM / 2- VOLTAR_"))
             if op < 1 or op > 2:
                 raise ValueError
             elif op == 2:
                 break
         except ValueError:
-            print("Insira um dado/opção válido")
+            print("INSIRA UM(A) DADO/OPÇÃO VÁLIDO(A)")
 
-def alterarAluno():
+def alterarElemento(categoria):
     while True:
         try:
             nome = input("NOME: ")
@@ -130,30 +133,125 @@ def alterarAluno():
                 print("CPF inválido.")
                 raise ValueError
             if nome == "" and cpf == "":
-                escola.buscarAluno()
+                a = escola.buscarElemento(categoria)
             elif nome == "" and cpf != "":
-                if not escola.buscarAluno(id=cpf):
-                    print("ALUNO NÃO ENCONTRADO.")
-                    dado = False
-                else:
-                    dado = True
+                lista = []
+                if escola.buscarElemento(categoria, id=cpf) != 0:
+                    lista = escola.buscarElemento(categoria, id=cpf)
+                    for i in range(len(lista)):
+                        print(f"{i} - {lista[i][0]}")
+                    op1 = int(input(f"ALTERAR DADOS PARA QUAL {categoria}? 0 a {len(lista) - 1} / {len(lista)} - VOLTAR_"))
+                    if op1 < 0 or op1 > len(lista):
+                        raise ValueError
+                    elif op1 == len(lista):
+                        break
+                    else:
+                        dado = True
+                        for i in range(len(lista)):
+                            if i == op1:
+                                nome = lista[i][0]
             elif cpf == "" and nome != "":
-                if not escola.buscarAluno(n=nome.lower()):
-                    print("ALUNO NÃO ENCONTRADO.")
-                    dado = False
+                lista = []
+                if escola.buscarElemento(categoria, n=nome) != 0:
+                    lista = escola.buscarElemento(categoria, n=nome)
+                    for i in range(len(lista)):
+                        print(f"{i} - {lista[i][0]}")
+                    op1 = int(input(f"ALTERAR DADOS PARA QUAL {categoria}? 0 a {len(lista) - 1} / {len(lista)} - VOLTAR_"))
+                    if op1 < 0 or op1 > len(lista):
+                        raise ValueError
+                    elif op1 == len(lista):
+                        break
+                    else:
+                        dado = True
+                        for i in range(len(lista)):
+                            if i == op1:
+                                nome = lista[i][0]
+                                cpf = lista[i][1]
+            elif cpf != "" and nome != "":
+                lista = []
+                if escola.buscarElemento(categoria, id=cpf) != 0:
+                    lista = escola.buscarElemento(categoria, id=cpf)
+                    for i in range(len(lista)):
+                        print(f"{i} - {lista[i][0]}")
+                    op1 = int(input(f"ALTERAR DADOS PARA QUAL {categoria}? 0 a {len(lista) - 1} / {len(lista)} - VOLTAR_"))
+                    if op1 < 0 or op1 > len(lista):
+                        raise ValueError
+                    elif op1 == len(lista):
+                        break
+                    else:
+                        dado = True
+                        for i in range(len(lista)):
+                            if i == op1:
+                                nome = lista[i][0]
                 else:
-                    dado = True
+                    lista = []
+                    if escola.buscarElemento(categoria, nome) == 0:
+                        lista = escola.buscarElemento(categoria, nome)
+                    for i in range(len(lista)):
+                        print(f"{i} - {lista[i][0]}")
+                    op1 = int(input(f"ALTERAR DADOS PARA QUAL {categoria}? 0 a {len(lista) - 1} / {len(lista)} - VOLTAR_"))
+                    if op1 < 0 or op > len(lista):
+                        raise ValueError
+                    elif op1 == len(lista):
+                        break
+                    else:
+                        dado = True
+                        for i in range(len(lista)):
+                            if i == op1:
+                                nome = lista[i][0]
+                                cpf = lista[i][1]
             if dado:
-                print("ALUNO ENCONTRADO.")
                 nome = nome.strip().upper()
+                print(f"{categoria} ENCONTRADO: {nome} - {cpf}")
                 novo_nome = input("CORRIGIR NOME: ").strip().upper()
                 novo_cpf = input("CORRIGIR CPF: ")
-                escola.alterarDados('Alunos', 'nome', nome, novo_nome)
-                escola.alterarDados('Alunos', 'cpf', cpf, novo_cpf)
-            op = int(input("ALTERAR MAIS ALGUM CADASTRO? 1- SIM / 2- VOLTAR_"))
+                if categoria == "ALUNO":
+                    escola.alterarDados('Alunos', 'nome', nome, novo_nome)
+                    escola.alterarDados('Alunos', 'cpf', cpf, novo_cpf)
+                elif categoria == "PROFESSOR":
+                    escola.alterarDados('Professores', 'nome', nome, novo_nome)
+                    escola.alterarDados('Professores', 'cpf', cpf, novo_cpf)
+            else:
+                print("DADOS NÃO ENCONTRADOS.")
+            op = int(input("CONTINUAR ALTERANDO CADASTRO? 1- SIM / 2- VOLTAR_"))
             if op < 1 or op > 2:
                 raise ValueError
             elif op == 2:
                 break
         except ValueError:
-            print("Insira um dado/opção válido")
+            print("INSIRA UM(A) DADO/OPÇÃO VÁLIDO(A)")
+
+def imprimirDados(categoria):
+    while True:
+        try:
+            nome = input("NOME: ").lower().strip()
+            cpf = input("CPF: ")
+            ccpf = True
+            for c in nome:
+                if c.isdigit():
+                    raise ValueError
+            for c in cpf:
+                if not c.isdigit():
+                    ccpf = False
+            if not ccpf:
+                print("CPF INVÁLIDO.\n")
+                raise ValueError
+            if categoria == "ALUNO":
+                tabela = 'Alunos'
+            elif categoria == "PROFESSOR":
+                tabela = 'Professores'
+            if nome == "" and cpf == "":
+                escola.mostrarDados(tabela, categoria)
+            elif nome == "" and cpf != "":
+                escola.mostrarDados(tabela, categoria, ide=cpf)
+            elif cpf == "" and nome != "":
+                escola.mostrarDados(tabela, categoria, no=nome)
+            elif cpf != "" and nome != "":
+                escola.mostrarDados(tabela, categoria, nome, cpf)
+            op = int(input(f"BUSCAR MAIS ALGUM {categoria}? 1- SIM / 2- VOLTAR_"))
+            if op < 1 or op > 2:
+                raise ValueError
+            elif op == 2:
+                break
+        except ValueError:
+            print("INSIRA UM(A) DADO/OPÇÃO VÁLIDO(A)")
