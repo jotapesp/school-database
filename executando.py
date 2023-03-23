@@ -1,5 +1,7 @@
 import escola
 
+ListaAlunos = []
+
 def menu():
     try:
         print("""
@@ -88,7 +90,7 @@ try:
     if op == 1:
         infoEscola()
     if op == 2:
-        break()
+        break
 except ValueError:
     print("Insira uma opção válida.")
 
@@ -106,5 +108,53 @@ def cadastrarAluno():
             print("CPF inválido.")
             raise ValueError
         escola.adicaoAluno(nome, cpf)
+        op == input("CADASTRAR MAIS ALUNOS? 1 - SIM 2 - VOLTAR")
+        if op < 1 or op > 2:
+            raise ValueError
+        elif op == 2:
+            break
     except ValueError:
-        print("Insira um dado")
+        print("Insira um dado/opção válido")
+
+def alterarAluno():
+    try:
+        nome = input("NOME: ")
+        cpf = int(input("CPF: ")
+        dado = False
+        for c in nome:
+            if c.isdigit():
+                raise ValueError
+        for c in cpf:
+            if not c.isdigit():
+                    ccpf = False
+        if not ccpf:
+            print("CPF inválido.")
+            raise ValueError
+        if nome == "" and cpf == "":
+            escola.buscarAluno()
+        elif nome == "" and cpf != "":
+            if not escola.buscarAluno(id=cpf):
+                dado = False
+                print("ALUNO NÃO ENCONTRADO.")
+            else:
+                dado = True
+        elif cpf == "" and nome != "":
+            if not escola.buscarAluno(n=nome.lower()):
+                dado = False
+                print("ALUNO NÃO ENCONTRADO.")
+            else:
+                dado = True
+        if dado:
+            print("ALUNO ENCONTRADO.")
+                novo_nome = input("CORRIGIR NOME: ")
+                novo_cpf = int(input("CORRIGIR CPF: "))
+            escola.alterarDados('Alunos', 'nome', nome.strip(), novo_nome.strip())
+            escola.alterarDados('Alunos', 'cpf', cpf, novo_cpf)
+        op == input("ALTERAR MAIS ALGUM CADASTRO? 1 - SIM 2 - VOLTAR")
+        if op < 1 or op > 2:
+            raise ValueError
+        elif op == 2:
+            break
+
+        except ValueError:
+            print("Insira um dado/opção válido")

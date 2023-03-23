@@ -76,3 +76,26 @@ db.commit()
 def adicaoAluno(n, id):
     cursor.execute("""INSERT INTO Alunos (nome, cpf) VALUES (n, id)""")
     db.commit()
+
+def buscarAluno(n=None, id=None):
+    if n == None and id == None:
+        print("Algum dado para busca deve ser inserido.")
+    elif n != None and id == None:
+        cursor.execute(f"SELECT nome FROM Alunos WHERE nome LIKE '%{n}%'")
+        if len(cursor.fetchall()) > 0:
+            return True
+        else:
+            return False
+    elif n == None and id != None:
+        cursor.execute(f"SELECT nome FROM Alunos WHERE cpf = {id}")
+        if len(cursor.fetchall()) > 0:
+            return True
+        else:
+            return False
+
+def alterarDados(tabela, dado, dado_antigo, dado_novo):
+    cursor.execute(f"""
+    UPDATE {tabela}
+    SET {dado} = {dado_novo}
+    WHERE {dado} = {dado_antigo}""")
+    db.commit()
