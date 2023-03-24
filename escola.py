@@ -200,7 +200,7 @@ def contarElementos(categoria, tabela):
     if categoria == "ALUNO" or categoria == "PROFESSOR" or categoria == "DISCIPLINA":
         sql = f"""SELECT COUNT(nome) FROM {tabela}"""
     cursor.execute(sql)
-    total = cursor.fetchall()[0][1]
+    total = cursor.fetchall()[0][0]
     return total
 
 def gerarLista(tabela):
@@ -208,5 +208,27 @@ def gerarLista(tabela):
     lista = cursor.fetchall()
     lista_final = []
     for nom in lista:
-        lista_final.append[nom[0]]
+        lista_final.append(nom[0])
     return lista_final
+
+# def configurarEscola(escola, cnpj, missao):
+#     total_alunos = 0
+#     total_prof = 0
+#     lista_prof = gerarLista("Professores")
+#     lista_materias = gerarLista("Disciplinas")
+#     total_alunos = contarElementos('ALUNO', 'Alunos')
+#     total_prof = len(lista_prof)
+#     with open("info.txt", "w") as arquivo:
+#         arquivo.write(f"{escola}-{cnpj}\n")
+#         arquivo.write(f"{missao}\n")
+#         arquivo.write("-".center(80, "-"))
+#         arquivo.write(f"DADOS:\n")
+#         arquivo.write(f"TOTAL DE ALUNOS: {total_alunos}\n")
+#         arquivo.write(f"PROFESSORES:\n")
+#         for nome in lista_prof:
+#             print("nome\n")
+#         arquivo.write(f"TOTAL DE PROFESSORES: {total_prof}\n")
+#         arquivo.write(f"DISCIPLINAS OFERTADAS:\n")
+#         for nome in lista_materias:
+#             print("nome\n")
+#     print("CONFIGURAÇÕES INICIAIS REALIZADAS COM SUCESSO.")

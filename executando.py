@@ -312,15 +312,14 @@ def imprimirDados(categoria):
             print("INSIRA UM(A) DADO/OPÇÃO VÁLIDO(A)")
 
 def infoEscola():
-
     if not os.path.exists("info.txt"):
         print("""\nPRIMEIRA VEZ ACESSANDO ESSE MENU, VAMOS FAZER
 UMAS CONFIGURAÇÕES INICIAIS.""")
-        escola = input("DIGITE O NOME DA ESCOLA: ").strip().upper()
+        nescola = input("DIGITE O NOME DA ESCOLA: ").strip().upper()
         cnpj = ""
         missao = ""
         while True:
-            cpnj = input("INFORME O CNPJ DA ESCOLA: ")
+            cnpj = input("INFORME O CNPJ DA ESCOLA: ")
             ccnpj = True
             for c in cnpj:
                 if not c.isdigit():
@@ -329,7 +328,8 @@ UMAS CONFIGURAÇÕES INICIAIS.""")
                 print("CNPJ INVÁLIDO.")
             else:
                 break
-        missao = "DIGITE A MISSÃO DA ESCOLA: ".strip().upper()
+        missao = input("DIGITE A MISSÃO DA ESCOLA: ").strip().upper()
+        # escola.configurarEscola(nescola, cnpj, missao)
         total_alunos = 0
         total_prof = 0
         lista_prof = escola.gerarLista("Professores")
@@ -337,38 +337,86 @@ UMAS CONFIGURAÇÕES INICIAIS.""")
         total_alunos = escola.contarElementos('ALUNO', 'Alunos')
         total_prof = len(lista_prof)
         with open("info.txt", "w") as arquivo:
-            arquivo.write(f"{escola}-{cnpj}\n")
+            arquivo.write(f"{nescola}-{cnpj}\n")
             arquivo.write(f"{missao}\n")
             arquivo.write("-".center(80, "-"))
+            arquivo.write("\n")
             arquivo.write(f"DADOS:\n")
+            arquivo.write("\n")
             arquivo.write(f"TOTAL DE ALUNOS: {total_alunos}\n")
+            arquivo.write("\n")
             arquivo.write(f"PROFESSORES:\n")
             for nome in lista_prof:
-                print("nome\n")
+                arquivo.write(f"{nome}\n")
             arquivo.write(f"TOTAL DE PROFESSORES: {total_prof}\n")
+            arquivo.write("\n")
             arquivo.write(f"DISCIPLINAS OFERTADAS:\n")
             for nome in lista_materias:
-                print("nome\n")
+                arquivo.write(f"{nome}\n")
+            arquivo.write("\n")
         print("CONFIGURAÇÕES INICIAIS REALIZADAS COM SUCESSO.")
 
     if os.path.exists("info.txt"):
         while True:
             try:
-                op = int(input("DESEJA EXIBIR AS INFORMAÇÕES SOBRE A ESCOLA? 1- SIM / 2- VOTAR_"))
-                if op < 1 and op > 2:
+                print("""MENU ESCOLA:
+            1 - SINCRONIZAR INFORMAÇÕES NOVAS
+            2 - EXIBIR INFORMAÇÕES SOBRE A ESCOLA
+            3 - RESETAR CONFIGURAÇÕES INICIAIS
+            4 - VOLTAR
+            """)
+                op = int(input("ESCOLHA UMA OPÇÃO: "))
+                if op < 1 and op > 3:
                     raise ValueError
-                elif op == 2:
+                elif op == 4:
                     break
                 elif op == 1:
+                    nome_escola = ""
+                    cnpj_escola = ""
+                    missao_escola = ""
                     with open("info.txt", "r") as arquivo:
                         linhas = arquivo.readlines()
                         l = linhas[0].split("-")
                         nome_escola = l[0]
                         cnpj_escola = l[1]
-                        print(f"NOME: {nome_escola} - CNPJ: {cnpj_escola}")
+                        missao_escola = linhas[1]
+                    total_alunos = 0
+                    total_prof = 0
+                    lista_prof = escola.gerarLista("Professores")
+                    lista_materias = escola.gerarLista("Disciplinas")
+                    total_alunos = escola.contarElementos('ALUNO', 'Alunos')
+                    total_prof = len(lista_prof)
+                    with open("info.txt", "w") as arquivo:
+                        arquivo.write(f"{nome_escola}-{cnpj_escola}\n")
+                        arquivo.write(f"{missao_escola}\n")
+                        arquivo.write("-".center(80, "-"))
+                        arquivo.write("\n")
+                        arquivo.write(f"DADOS:\n")
+                        arquivo.write("\n")
+                        arquivo.write(f"TOTAL DE ALUNOS: {total_alunos}\n")
+                        arquivo.write("\n")
+                        arquivo.write(f"PROFESSORES:\n")
+                        for nome in lista_prof:
+                            arquivo.write(f"{nome}\n")
+                        arquivo.write(f"TOTAL DE PROFESSORES: {total_prof}\n")
+                        arquivo.write("\n")
+                        arquivo.write(f"DISCIPLINAS OFERTADAS:\n")
+                        for nome in lista_materias:
+                            arquivo.write(f"{nome}\n")
+                        arquivo.write("\n")
+                    print("SINCRONIZAÇÃO CONCLUÍDA.")
+                elif op == 2:
+                    with open("info.txt", "r") as arquivo:
+                        linhas = arquivo.readlines()
+                        l = linhas[0].split("-")
+                        nome_escola = l[0]
+                        cnpj_escola = l[1]
+                        print(f"NOME: {nome_escola} - CNPJ: {cnpj_escola}", end="")
                         print(f"MISSÃO: {linhas[1]}")
                         for i in range(2, len(linhas)):
-                            print(linhas[i])
-
+                            print(linhas[i], end="")
+                elif op == 3:
+                    os.remove("info.txt")
+                    break
             except ValueError:
                 print("OPÇÃO INVÁLIDA.")
