@@ -89,13 +89,15 @@ if not tableExists('Hist_Disc'):
     cursor.execute(comando)
     db.commit()
 
-def adicaoElemento(categoria, n, id=None, ch=None):
+def adicaoElemento(categoria, n, id=None, ch=None, ano=None):
     if categoria == "ALUNO":
         cursor.execute(f"""INSERT INTO Alunos (nome, cpf) VALUES ('{n}', '{id}')""")
     elif categoria == "PROFESSOR":
         cursor.execute(f"""INSERT INTO Professores (nome, cpf) VALUES ('{n}', '{id}')""")
     elif categoria == "DISCIPLINA":
         cursor.execute(f"""INSERT INTO Disciplinas (nome, cargaH) VALUES ('{n}', '{ch}')""")
+    elif categoria == "TURMA":
+        cursor.execute(f"""INSERT INTO Turmas (titulo, ano) VALUES ('{n}', {ano})""")
     db.commit()
 
 def buscarElemento(categoria, n=None, id=None):

@@ -84,7 +84,8 @@ def menuEscola():
             2 - REGISTRAR DISCIPLINA
             3 - ALTERAR DADOS DE DISCIPLINA
             4 - BUSCAR INFORMAÇÕES SOBRE DISCIPLINA
-            5 - VOLTAR
+            5 - CONFIGURAÇÕES DE TURMAS
+            6 - VOLTAR
             """)
             op = int(input("SELECIONA UMA OPÇÃO: "))
             if op < 1 or op > 6:
@@ -98,6 +99,8 @@ def menuEscola():
             if op == 4:
                 imprimirDados('DISCIPLINA')
             if op == 5:
+                configTurma()
+            if op == 6:
                 break
         except ValueError:
             print("INSIRA UMA OPÇÃO VÁLIDA.")
@@ -105,9 +108,10 @@ def menuEscola():
 def cadastrar(categoria):
     while True:
         try:
-            nome = ""
-            cpf = ""
-            cha = ""
+            # nome = ""
+            # cpf = ""
+            # cha = ""
+            # anot = ""
             if categoria == "ALUNO" or categoria == "PROFESSOR":
                 nome = input("NOME: ").strip().upper()
                 cpf = input("CPF: ")
@@ -126,6 +130,10 @@ def cadastrar(categoria):
                 nome = input("DISCIPLINA: ").strip().upper()
                 cha = input("CARGA HORÁRIA: ").strip().upper()
                 escola.adicaoElemento(categoria, nome, ch=cha)
+            elif categoria == "TURMA":
+                titulo = input("INFORME O TÍTULO DA TURMA: ").strip().upper()
+                anot = int(input("INFORME O ANO DA TURMA: "))
+                escola.adicaoElemento("TURMA", titulo, ano=anot)
             op = int(input(f"CADASTRAR MAIS {categoria.upper()}S? 1- SIM / 2- VOLTAR_"))
             if op < 1 or op > 2:
                 raise ValueError
@@ -420,3 +428,26 @@ UMAS CONFIGURAÇÕES INICIAIS.""")
                     break
             except ValueError:
                 print("OPÇÃO INVÁLIDA.")
+
+def configTurma():
+    while True:
+        try:
+            print("""CONFIGURAÇÕES DE TURMA:
+            1 - CRIAR TURMA
+            2 - CADASTRAR DISCIPLINA PARA UMA TURMA
+            3 - ATRIBUIR PROFESSOR A UMA TURMA
+            4 - VOLTAR
+            """)
+            op = int(input("ESCOLHA UMA OPÇÃO: "))
+            if op < 1 or op > 4:
+                raise ValueError
+            if op == 1:
+                cadastrar("TURMA")
+            if op == 2:
+                
+            if op == 3:
+
+            if op == 4:
+                break
+        except ValueError:
+            print("INSIRA UMA OPÇÃO VÁLIDA.")
