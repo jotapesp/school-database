@@ -89,38 +89,49 @@ if not tableExists('Hist_Disc'):
     cursor.execute(comando)
     db.commit()
 
-def adicaoElemento(categoria, n, id):
+def adicaoElemento(categoria, n, id=None, ch=None):
     if categoria == "ALUNO":
         cursor.execute(f"""INSERT INTO Alunos (nome, cpf) VALUES ('{n}', '{id}')""")
     elif categoria == "PROFESSOR":
         cursor.execute(f"""INSERT INTO Professores (nome, cpf) VALUES ('{n}', '{id}')""")
+    elif categoria == "DISCIPLINA":
+        cursor.execute(f"""INSERT INTO Disciplinas (nome, cargaH) VALUES ('{n}', '{ch}')""")
     db.commit()
 
 def buscarElemento(categoria, n=None, id=None):
     tabela = ""
+    dado1 = ""
+    dado2 = ""
     if categoria == "ALUNO":
         tabela = 'Alunos'
+        dado1 = 'nome'
+        dado2 = 'cpf'
     if categoria == "PROFESSOR":
         tabela = 'Professores'
+        dado1 = 'nome'
+        dado2 = 'cpf'
+    if categoria == "DISCIPLINA":
+        tabela = 'Disciplinas'
+        dado1 = 'nome'
+        dado2 = 'cargaH'
     if n == None and id == None:
-        print("ALGUM DADO PARA BUSCA DEVE SER INSERIDO")
         return 0
     elif n != None and id == None:
-        cursor.execute(f"SELECT nome, cpf FROM {tabela} WHERE nome LIKE '%{n}%'")
+        cursor.execute(f"SELECT {dado1}, {dado2} FROM {tabela} WHERE nome LIKE '%{n}%'")
         lista = cursor.fetchall()
         if len(lista) > 0:
             return lista
         else:
             return 0
     elif n == None and id != None:
-        cursor.execute(f"SELECT nome, cpf FROM {tabela} WHERE cpf = '{id}'")
+        cursor.execute(f"SELECT {dado1}, {dado2} FROM {tabela} WHERE cpf = '{id}'")
         lista = cursor.fetchall()
         if len(lista) > 0:
             return lista
         else:
             return 0
     elif n != None and id != None:
-        cursor.execute(f"SELECT nome, cpf FROM {tabela} WHERE cpf = '{id}'")
+        cursor.execute(f"SELECT {dado1}, {dado2} FROM {tabela} WHERE cpf = '{id}'")
         lista = cursor.fetchall()
         if len(lista) > 0:
             return lista
@@ -184,3 +195,18 @@ def mostrarDados(tabela, categoria, no=None, ide=None):
             for i in range(1, len(lista[0])):
                 print(f"{lista[op][i]}")
             print()
+
+def contarElementos(categoria, tabela):
+    if categoria == "ALUNO" or categoria == "PROFESSOR" or categoria == "DISCIPLINA":
+        sql = f"""SELECT COUNT(nome) FROM {tabela}"""
+    cursor.execute(sql)
+    total = cursor.fetchall()[0][1]
+    return total
+
+def gerarLista(tabela):
+    cursor.execute(f"""SELECT nome FROM {tabela}""")
+    lista = cursor.fetchall()
+    lista_final = []
+    for nom in lista:
+        lista_final.append[nom[0]]
+    return lista_final
