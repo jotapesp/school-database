@@ -136,6 +136,13 @@ def buscarElemento(categoria, n=None, id=None, todos=False):
     #    dado2 = "codAluno"
     #if categoria == "DISC_T":
     #    tabela = "Disc_Turma"
+    #if n.upper() == "TODOS":
+    #    cursor.execute(f"SELECT * FROM {tabela}")
+    #    lista = cursor.fetchall()
+    #    if len(lista) > 0:
+    #        return lista
+    #    else:
+    #        return 0
     if categoria == "HISTORICOS":
         cursor.execute(f"""SELECT codHistorico FROM Historico
         WHERE codAluno = {n}""")
@@ -238,10 +245,37 @@ def mostrarDados(tabela, categoria, no=None, ide=None):
         elif op == len(lista):
             print("NENHUM NOME SELECIONADO.")
         elif op >= 0 or op < len(lista):
-            print(f"\nCOD. IDENTIFICADOR: {lista[0][0]}")
+            print(f"\nCOD. IDENTIFICADOR: {lista[op][0]}")
             for i in range(1, len(lista[0])):
                 print(f"{lista[op][i]}")
             print()
+    elif lista == []:
+        try:
+            sql = f"""SELECT *
+            FROM {tabela}
+            WHERE nome LIKE cpf = '{ide}'"""
+            cursor.execute(sql)
+            lista = cursor.fetchall()
+            if lista == []:
+                raise ValueError
+            else:
+                print("""\nNENHUM REGISTRO QUE CONTENHAM AMBOS OS DADOS.
+DADOS ENCONTRADOS:""")
+                for i in range(len(lista)):
+                    print(f"{i} - {lista[i][1]}")
+                print(f"{len(lista)} - VOLTAR")
+                op = int(input("DIGITE O NUMERO REFERENTE AO NOME: "))
+                if op < 0 or op > (len(lista) + 1):
+                    raise ValueError
+                elif op == len(lista):
+                    print("NENHUM NOME SELECIONADO.")
+                elif op >= 0 or op < len(lista):
+                    print(f"\nCOD. IDENTIFICADOR: {lista[0][0]}")
+                    for i in range(1, len(lista[0])):
+                        print(f"{lista[op][i]}")
+                    print()
+        except:
+            print("ALGUM DOS DADOS NÃO FOI ENCONTRADO. OU AMBOS.")
 
 def contarElementos(categoria, tabela):
     if categoria == "ALUNO" or categoria == "PROFESSOR" or categoria == "DISCIPLINA":

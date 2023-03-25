@@ -411,13 +411,15 @@ UMAS CONFIGURAÇÕES INICIAIS.""")
                 print("""MENU ESCOLA:
             1 - SINCRONIZAR INFORMAÇÕES NOVAS
             2 - EXIBIR INFORMAÇÕES SOBRE A ESCOLA
-            3 - RESETAR CONFIGURAÇÕES INICIAIS
-            4 - VOLTAR
+            3 - RESETAR INFORMAÇÕES SOBRE A ESCOLA
+            4 - RESETAR BANCO DE DADOS
+            5 - RESTAURAR BACKUP DE DADOS
+            6 - VOLTAR
             """)
                 op = int(input("ESCOLHA UMA OPÇÃO: "))
-                if op < 1 and op > 3:
+                if op < 1 and op > 6:
                     raise ValueError
-                elif op == 4:
+                elif op == 6:
                     break
                 elif op == 1:
                     nome_escola = ""
@@ -466,9 +468,34 @@ UMAS CONFIGURAÇÕES INICIAIS.""")
                             print(linhas[i], end="")
                 elif op == 3:
                     os.remove("info.txt")
+                    print("""\nOS DADOS SOBRE A ESCOLA FORAM RESETADOS.
+VISITE O MENU DE INFORMAÇÕES SOBRE A ESCOLA
+NOVAMENTE PARA RECONFIGURAR.""")
                     break
+                elif op == 4:
+                    os.rename("escola.db", "backup_escola.db")
+                    print(f"""O BANCO DE DADOS FOI APAGADO.
+UM BACKUP DE SEGURANÇA FOI CRIADO EM
+'{os.path.abspath("backup_escola.db")}'
+REINICIE O PROGRAM PARA QUE AS ALTERAÇÕES TENHAM EFEITO.""")
+                elif op == 5:
+                    if os.path.exists("backup_escola.db"):
+                        if os.path.exists("escola.db"):
+                            os.rename("escola.db", "old_escola.db")
+                            print(f"""O BANCO DE DADOS ATUAL FOI ARMAZENADO EM
+'{os.path.abspath("old_escola.db")}'""")
+                        os.rename("backup_escola.db", "escola.db")
+                        print("""BANCO DE DADOS RESTAURADO.
+REINICIE O PROGRAMA PARA QUE AS ALTERAÇÕES TENHAM EFEITO.""")
+                    else:
+                        print(f"""BACKUP NÃO ENCONTRADO. O BACKUP DEVE ESTAR EM
+'{os.getcwd()}'
+COM O NOME DE 'backup_escola.db'""")
             except ValueError:
                 print("OPÇÃO INVÁLIDA.")
+            except FileNotFoundError:
+                print("ARQUIVO NÃO ENCONTRADO. REINICIE O PROGRAMA.")
+                break
 
 def configTurma():
     while True:
