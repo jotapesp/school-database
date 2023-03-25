@@ -45,9 +45,9 @@ def menuAluno():
             if op == 3:
                 imprimirDados('ALUNO')
             if op == 4:
-                registrarNota()
+                cadastrar("NOTA")
             if op == 5:
-                historico()
+                escola.historico()
             if op == 6:
                 break
         except ValueError:
@@ -60,10 +60,11 @@ def menuProfessor():
             1 - CADASTRAR PROFESSOR
             2 - ALTERAR CADASTRO DE PROFESSOR
             3 - BUSCAR DADOS DO PROFESSOR
-            4 - VOLTAR
+            4 - ATRIBUIR PROFESSOR A UMA DISCIPLINA
+            5 - VOLTAR
             """)
             op = int(input("SELECIONA UMA OPÇÃO: "))
-            if op < 1 or op > 4:
+            if op < 1 or op > 5:
                 raise ValueError
             if op == 1:
                 cadastrar('PROFESSOR')
@@ -72,6 +73,8 @@ def menuProfessor():
             if op == 3:
                 imprimirDados('PROFESSOR')
             if op == 4:
+                cadastrar("DISC_T")
+            if op == 5:
                 break
         except ValueError:
             print("INSIRA UMA OPÇÃO VÁLIDA.")
@@ -88,7 +91,7 @@ def menuEscola():
             6 - VOLTAR
             """)
             op = int(input("SELECIONA UMA OPÇÃO: "))
-            if op < 1 or op > 6:
+            if op < 1 or op > 7:
                 raise ValueError
             if op == 1:
                 infoEscola()
@@ -125,15 +128,38 @@ def cadastrar(categoria):
                 if not ccpf:
                     print("CPF inválido.")
                     raise ValueError
-                escola.adicaoElemento(categoria, nome, id=cpf)
+                escola.adicaoElemento(categoria, n=nome, id=cpf)
+                if categoria == "ALUNO":
+                    l = escola.buscarElemento("ALUNO", n=nome, id=cpf, todos=True)
+                    cod_aluno = l[0][0]
+                    escola.adicaoElemento("HISTORICOS", n=cod_aluno)
+
             elif categoria == "DISCIPLINA":
                 nome = input("DISCIPLINA: ").strip().upper()
                 cha = input("CARGA HORÁRIA: ").strip().upper()
-                escola.adicaoElemento(categoria, nome, ch=cha)
+                escola.adicaoElemento(categoria, n=nome, ch=cha)
             elif categoria == "TURMA":
                 titulo = input("INFORME O TÍTULO DA TURMA: ").strip().upper()
                 anot = int(input("INFORME O ANO DA TURMA: "))
-                escola.adicaoElemento("TURMA", titulo, ano=anot)
+                escola.adicaoElemento("TURMA", n=titulo, ano=anot)
+            elif categoria == "DISC_T":
+                hora = input("INFORME O HORÁRIO: ")
+                cod_disci = escola.buscarCodigo("DISCIPLINA")
+                cod_turma = escola.buscarCodigo("TURMA")
+                cod_prof = escola.buscarCodigo("PROFESSOR")
+                L = [cod_disci, cod_prof, cod_turma, hora]
+                escola.adicaoElemento("DISC_T", cod_disci, cod_prof, cod_turma, hora)
+            elif categoria == "NOTA":
+                cod_aluno = escola.buscarCodigo("ALUNO")
+                l = escola.buscarElemento("HISTORICOS", n=cod_aluno)
+                cod_hist = l[0][0]
+                cod_turma = escola.buscarCodigo("TURMA")
+                l3 = escola.buscarCodigo("DISCIPLINA")
+                l2 = escola.buscarElemento("DISC_T", n=l3, id=cod_turma)   ###OLHAR AQUI
+                cod_disci = l2[0][0]
+                nota = float(input("INFORME A NOTA A REGISTRAR: "))
+                escola.adicaoElemento("HIST_D", cod_hist, cod_disci, nota)
+
             op = int(input(f"CADASTRAR MAIS {categoria.upper()}S? 1- SIM / 2- VOLTAR_"))
             if op < 1 or op > 2:
                 raise ValueError
@@ -433,10 +459,9 @@ def configTurma():
     while True:
         try:
             print("""CONFIGURAÇÕES DE TURMA:
-            1 - CRIAR TURMA
-            2 - CADASTRAR DISCIPLINA PARA UMA TURMA
-            3 - ATRIBUIR PROFESSOR A UMA TURMA
-            4 - VOLTAR
+            1 - CADASTRAR TURMA
+            2 - ATRIBUIR DISCIPLINA A UMA TURMA
+            3 - VOLTAR
             """)
             op = int(input("ESCOLHA UMA OPÇÃO: "))
             if op < 1 or op > 4:
@@ -444,10 +469,11 @@ def configTurma():
             if op == 1:
                 cadastrar("TURMA")
             if op == 2:
-                
+                cadastrar("DISC_T")
             if op == 3:
-
-            if op == 4:
                 break
         except ValueError:
             print("INSIRA UMA OPÇÃO VÁLIDA.")
+
+# def historico():
+#     cod_aluno = escola.buscarCodigo("ALUNO")

@@ -62,7 +62,8 @@ if not tableExists('Disc_Turma'):
     codDisc_Turma integer PRIMARY KEY NOT NULL,
     codDisciplina integer NOT NULL,
     codProfessor integer NOT NULL,
-    codTurma integer NOT NULL
+    codTurma integer NOT NULL,
+    horario TEXT NOT NULL
     )"""
     cursor.execute(comando)
     db.commit()
@@ -89,7 +90,7 @@ if not tableExists('Hist_Disc'):
     cursor.execute(comando)
     db.commit()
 
-def adicaoElemento(categoria, n, id=None, ch=None, ano=None):
+def adicaoElemento(categoria, n=None, id=None, ch=None, ano=None):
     if categoria == "ALUNO":
         cursor.execute(f"""INSERT INTO Alunos (nome, cpf) VALUES ('{n}', '{id}')""")
     elif categoria == "PROFESSOR":
@@ -98,9 +99,18 @@ def adicaoElemento(categoria, n, id=None, ch=None, ano=None):
         cursor.execute(f"""INSERT INTO Disciplinas (nome, cargaH) VALUES ('{n}', '{ch}')""")
     elif categoria == "TURMA":
         cursor.execute(f"""INSERT INTO Turmas (titulo, ano) VALUES ('{n}', {ano})""")
+    elif categoria == "DISC_T":
+        # a, b, c, d = n
+        #L = [n, id, ch, ano]
+        cursor.execute(f"""INSERT INTO Disc_Turma (codDisciplina, codProfessor, codTurma, horario) VALUES ({n}, {id}, {ch}, '{ano}')""")
+    elif categoria == "HISTORICO":
+        cursor.execute(f"""INSERT INTO Historico (codAluno) VALUES ({n})""")
+    elif categoria == "HIST_D":
+        # a, b, c = n
+        cursor.execute(f"""INSERT INTO Hist_Disc (codHistorico, codDisciplina, nota) VALUES ({n}, {id}, {ch})""")
     db.commit()
 
-def buscarElemento(categoria, n=None, id=None):
+def buscarElemento(categoria, n=None, id=None, todos=False):
     tabela = ""
     dado1 = ""
     dado2 = ""
@@ -116,24 +126,59 @@ def buscarElemento(categoria, n=None, id=None):
         tabela = 'Disciplinas'
         dado1 = 'nome'
         dado2 = 'cargaH'
-    if n == None and id == None:
+    if categoria == "TURMA":
+        tabela = "Turmas"
+        dado1 = "titulo"
+        dado2 = "ano"
+    if categoria == "HISTORICOS":
+        tabela = "Historico"
+        dado1 = "codHistorico"
+        dado2 = "codAluno"
+    if categoria == "DISC_T":
+        tabela = "Disc_Turma"
+    if categoria == "HISTORICOS":
+        cursor.execute(f"""SELECT codHistorico FROM Historico
+        WHERE codAluno = {n}""")
+        lista = cursor.fetchall()
+        if len(lista) > 0:
+            return lista
+        else:
+            return 0
+    elif categoria == "DISC_T":
+        cursor.execute(f"""SELECT codDisc_Turma FROM Disc_Turma WHERE
+        codDisc_Turma = {n} AND codTurma = {id}""")
+        lista = cursor.fetchall()
+        if len(lista) > 0:
+            return lista
+        else:
+            return 0
+    elif n == None and id == None:
         return 0
     elif n != None and id == None:
-        cursor.execute(f"SELECT {dado1}, {dado2} FROM {tabela} WHERE nome LIKE '%{n}%'")
+        if todos:
+            cursor.execute(f"SELECT * FROM {tabela} WHERE {dado1} LIKE '%{n}%'")
+        else:
+            cursor.execute(f"SELECT {dado1}, {dado2} FROM {tabela} WHERE nome LIKE '%{n}%'")
         lista = cursor.fetchall()
         if len(lista) > 0:
             return lista
         else:
             return 0
     elif n == None and id != None:
-        cursor.execute(f"SELECT {dado1}, {dado2} FROM {tabela} WHERE cpf = '{id}'")
+        if todos:
+            cursor.execute(f"SELECT * FROM {tabela} WHERE cpf = '{id}'")
+        else:
+            cursor.execute(f"SELECT {dado1}, {dado2} FROM {tabela} WHERE cpf = '{id}'")
         lista = cursor.fetchall()
         if len(lista) > 0:
             return lista
         else:
             return 0
     elif n != None and id != None:
-        cursor.execute(f"SELECT {dado1}, {dado2} FROM {tabela} WHERE cpf = '{id}'")
+        if todos:
+            cursor.execute(f"SELECT * FROM {tabela} WHERE cpf = '{id}'")
+        else:
+            cursor.execute(f"SELECT {dado1}, {dado2} FROM {tabela} WHERE cpf = '{id}'")
         lista = cursor.fetchall()
         if len(lista) > 0:
             return lista
@@ -212,6 +257,49 @@ def gerarLista(tabela):
     for nom in lista:
         lista_final.append(nom[0])
     return lista_final
+
+def buscarCodigo(categoria, nome=None):
+    while True:
+        nome = input(f"INFORME A/O {categoria}: ")
+        lista = buscarElemento(categoria, n=nome, todos=True)
+        if lista != 0:
+            print(f"{categoria}S ENCONTRADOS: ")
+            for i in range(len(lista)):
+                print(f"{i} - {lista[i][1]} {lista[i][2]}")
+            op1 = int(input(f"ESCOLHA A OPÇÃO REFERENTE A(AO) {categoria} (0 a {len(lista) - 1})_"))
+            return lista[op1][0]
+        else:
+            print("NADA ENCONTRADO.")
+
+def historico():
+    cod_aluno = buscarCodigo("ALUNO")
+    cursor.execute(f"""SELECT nome FROM Alunos WHERE codAluno = {cod_aluno}""")
+    l_aluno = cursor.fetchall()
+    cursor.execute(f"""SELECT Hist_Disc.codDisciplina, Hist_Disc.nota)
+    FROM Hist_Disc INNER JOIN Historico ON Historico.codAluno = {cod_aluno}""")
+    lista1 = cursor.fetchall()
+    print(f"ALUNO: {l_aluno[0][0]} - COD. ALUNO: {cod_aluno}")
+
+    for i in range(len(lista1)):
+        cursor.execute(f"""SELECT Disc_Turma.codTurma, Disc_Turma.codDisciplina,
+        Disc_Turma.codProfessor FROM Disc_Turma INNER JOIN Hist_Disc ON
+        Disc_Turma.codDisc_Turma = {lista1[i][0]}""")
+        lista2 = cursor.fetchall()
+
+        cursor.execute(f"""SELECT titulo, ano FROM Turmas WHERE
+        codTurma = {lista2[i][0]}""")
+        l_turma = cursor.fetchall()
+        cursor.execute(f"""SELECT nome FROM Disciplinas WHERE
+        codDisciplina = {lista2[i][1]}""")
+        l_disciplina = cursor.fetchall()
+        cursor.execute(f"""SELECT nome FROM Professores WHERE
+        codProfessor = {lista2[i][2]}""")
+        l_professor = cursor.fetchall()
+
+        print(f"TURMA: {l_turma[0][0]} - ANO: {l_turma[0][1]}")
+        print(f"""DISCIPLINA: {l_disciplina[0][0]} - PROFESSOR: {l_professor[0][0]}""")
+        print(f"NOTA: {lista1[i][1]}")
+
 
 # def configurarEscola(escola, cnpj, missao):
 #     total_alunos = 0
