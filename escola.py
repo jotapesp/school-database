@@ -130,12 +130,12 @@ def buscarElemento(categoria, n=None, id=None, todos=False):
         tabela = "Turmas"
         dado1 = "titulo"
         dado2 = "ano"
-    if categoria == "HISTORICOS":
-        tabela = "Historico"
-        dado1 = "codHistorico"
-        dado2 = "codAluno"
-    if categoria == "DISC_T":
-        tabela = "Disc_Turma"
+    #if categoria == "HISTORICOS":
+    #    tabela = "Historico"
+    #    dado1 = "codHistorico"
+    #    dado2 = "codAluno"
+    #if categoria == "DISC_T":
+    #    tabela = "Disc_Turma"
     if categoria == "HISTORICOS":
         cursor.execute(f"""SELECT codHistorico FROM Historico
         WHERE codAluno = {n}""")
@@ -146,7 +146,7 @@ def buscarElemento(categoria, n=None, id=None, todos=False):
             return 0
     elif categoria == "DISC_T":
         cursor.execute(f"""SELECT codDisc_Turma FROM Disc_Turma WHERE
-        codDisc_Turma = {n} AND codTurma = {id}""")
+        codDisciplina = {n} AND codTurma = {id}""")
         lista = cursor.fetchall()
         if len(lista) > 0:
             return lista
@@ -275,10 +275,11 @@ def historico():
     cod_aluno = buscarCodigo("ALUNO")
     cursor.execute(f"""SELECT nome FROM Alunos WHERE codAluno = {cod_aluno}""")
     l_aluno = cursor.fetchall()
-    cursor.execute(f"""SELECT Hist_Disc.codDisciplina, Hist_Disc.nota)
-    FROM Hist_Disc INNER JOIN Historico ON Historico.codAluno = {cod_aluno}""")
+    cursor.execute(f"""SELECT Hist_Disc.codDisciplina, Hist_Disc.nota
+    FROM Hist_Disc WHERE Hist_Disc.codHistorico = (SELECT codHistorico FROM
+    Historico WHERE codAluno = {cod_aluno})""")
     lista1 = cursor.fetchall()
-    print(f"ALUNO: {l_aluno[0][0]} - COD. ALUNO: {cod_aluno}")
+    print(f"\nALUNO: {l_aluno[0][0]} - COD. ALUNO: {cod_aluno}")
 
     for i in range(len(lista1)):
         cursor.execute(f"""SELECT Disc_Turma.codTurma, Disc_Turma.codDisciplina,

@@ -110,6 +110,7 @@ def menuEscola():
 
 def cadastrar(categoria):
     while True:
+        cod_erro = 0
         try:
             # nome = ""
             # cpf = ""
@@ -152,11 +153,21 @@ def cadastrar(categoria):
             elif categoria == "NOTA":
                 cod_aluno = escola.buscarCodigo("ALUNO")
                 l = escola.buscarElemento("HISTORICOS", n=cod_aluno)
-                cod_hist = l[0][0]
+                cod_hist = 0
+                if l != 0:
+                    cod_hist = l[0][0]
+                else:
+                    raise ValueError
                 cod_turma = escola.buscarCodigo("TURMA")
-                l3 = escola.buscarCodigo("DISCIPLINA")
-                l2 = escola.buscarElemento("DISC_T", n=l3, id=cod_turma)   ###OLHAR AQUI
-                cod_disci = l2[0][0]
+                cod_disci1 = escola.buscarCodigo("DISCIPLINA")
+                cod_disci2 = escola.buscarElemento("DISC_T", n=cod_disci1, id=cod_turma)   ###OLHAR AQUI
+                cod_disci = 0
+                if cod_disci2 != 0:
+                    print("a busca funcionou, é != 0")
+                    cod_disci = cod_disci2[0][0]
+                else:
+                    cod_erro = 2
+                    raise ValueError("VERIFIQUE SE A DISCIPLINA FOI CADASTRADA PARA ESSA TURMA.")
                 nota = float(input("INFORME A NOTA A REGISTRAR: "))
                 escola.adicaoElemento("HIST_D", cod_hist, cod_disci, nota)
 
@@ -165,8 +176,12 @@ def cadastrar(categoria):
                 raise ValueError
             elif op == 2:
                 break
-        except ValueError:
-            print("INSIRA UM(A) DADO/OPÇÃO VÁLIDO(A)")
+        except ValueError as e:
+            if cod_erro == 2:
+                print(f"ERRO: {e}")
+                break
+            else:
+                print("INSIRA UM(A) DADO/OPÇÃO VÁLIDO(A)")
 
 def alterarElemento(categoria):
     while True:
