@@ -163,7 +163,6 @@ def cadastrar(categoria):
                 cod_disci2 = escola.buscarElemento("DISC_T", n=cod_disci1, id=cod_turma)   ###OLHAR AQUI
                 cod_disci = 0
                 if cod_disci2 != 0:
-                    print("a busca funcionou, é != 0")
                     cod_disci = cod_disci2[0][0]
                 else:
                     cod_erro = 2
